@@ -1,9 +1,10 @@
-FROM openjdk:11-jre-slim
+FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-COPY target/your-application.jar ./app.jar
+COPY target/rubric-service-0.0.1-SNAPSHOT.jar /app/rubric.jar
 
-EXPOSE 8080
+EXPOSE 8084
 
-CMD ["java", "-jar", "app.jar"]
+CMD ["java", "-jar", "rubric.jar"]
+
