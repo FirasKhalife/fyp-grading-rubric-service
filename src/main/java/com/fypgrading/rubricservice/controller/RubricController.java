@@ -37,14 +37,14 @@ public class RubricController {
         return ResponseEntity.ok().body(createdRubric);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{id: [0-9]+}")
     public ResponseEntity<RubricDTO> updateRubric(@PathVariable Integer id, @RequestBody RubricDTO rubricDTO) {
         RubricDTO rubrics = rubricService.updateRubric(id, rubricDTO);
         return ResponseEntity.ok().body(rubrics);
     }
 
     @PutMapping("/{assessment}")
-    public ResponseEntity<List<RubricDTO>> updateRubricsByAssessment(@PathVariable AssessmentEnum assessment,
+    public ResponseEntity<List<RubricDTO>> updateRubricsByAssessment(@PathVariable String assessment,
                                                                      @RequestBody List<RubricDTO> rubricDTOList) {
         List<RubricDTO> rubrics = rubricService.updateRubricsByAssessment(assessment, rubricDTOList);
         return ResponseEntity.ok().body(rubrics);

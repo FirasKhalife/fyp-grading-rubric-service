@@ -14,7 +14,7 @@ public enum AssessmentEnum {
     @JsonProperty("PROGRESS")
     PROGRESS,
 
-    @JsonProperty("PROGRESS_REPORT")
+    @JsonProperty("ADVISOR")
     ADVISOR,
 
     @JsonProperty("FINAL_REPORT")

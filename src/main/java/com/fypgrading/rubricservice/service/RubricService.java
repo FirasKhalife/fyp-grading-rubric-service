@@ -8,6 +8,7 @@ import com.fypgrading.rubricservice.service.mapper.RubricMapper;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixProperty;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,7 +68,9 @@ public class RubricService {
         return rubricMapper.toDTOList(rubrics);
     }
 
-    public List<RubricDTO> updateRubricsByAssessment(AssessmentEnum assessment, List<RubricDTO> rubricDTOList) {
+    @Transactional
+    public List<RubricDTO> updateRubricsByAssessment(String assessmentStr, List<RubricDTO> rubricDTOList) {
+        AssessmentEnum assessment = AssessmentEnum.valueOf(assessmentStr.toUpperCase());
         List<Rubric> rubrics = rubricMapper.toEntityList(rubricDTOList);
         rubricRepository.deleteAllByAssessment(assessment);
         List<Rubric> updatedEntities = rubricRepository.saveAll(rubrics);
