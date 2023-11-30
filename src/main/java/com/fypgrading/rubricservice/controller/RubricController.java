@@ -2,7 +2,7 @@ package com.fypgrading.rubricservice.controller;
 
 import com.fypgrading.rubricservice.service.RubricService;
 import com.fypgrading.rubricservice.service.dto.RubricDTO;
-import com.fypgrading.rubricservice.service.enums.AssessmentEnum;
+import com.fypgrading.rubricservice.service.dto.RubricDTOList;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,9 +26,9 @@ public class RubricController {
     }
 
     @GetMapping("/{assessment}")
-    public ResponseEntity<List<RubricDTO>> getRubricsByAssessment(@PathVariable String assessment) {
+    public ResponseEntity<RubricDTOList> getRubricsByAssessment(@PathVariable String assessment) {
         List<RubricDTO> rubrics = rubricService.getRubricsByAssessment(assessment);
-        return ResponseEntity.ok().body(rubrics);
+        return ResponseEntity.ok().body(new RubricDTOList(rubrics));
     }
 
     @PostMapping("/")
