@@ -13,6 +13,6 @@ FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-COPY --from=build /app/target/account-service-0.0.1-SNAPSHOT.jar /app/rubric.jar
+COPY --from=build /app/target/rubric-service-0.0.1-SNAPSHOT.jar /app/rubric.jar
 
 ENTRYPOINT ["java", "-jar", "rubric.jar"]

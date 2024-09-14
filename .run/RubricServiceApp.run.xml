@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Rubric Service" type="Application" factoryName="Application">
+  <configuration default="false" name="RubricServiceApp" type="Application" factoryName="Application">
     <envs>
       <env name="DATABASE_URL" value="jdbc:postgresql://localhost:5433/rubric-db" />
       <env name="DATABASE_USERNAME" value="admin" />
       <env name="DATABASE_PASSWORD" value="admin" />
       <env name="REGISTRY_SERVICE_URL" value="http://localhost:8761/eureka/" />
       <env name="SPRING_PROFILES_ACTIVE" value="dev" />
-      <env name="PORT" value="8083" />
+      <env name="PORT" value="8085" />
     </envs>
     <option name="MAIN_CLASS_NAME" value="com.fypgrading.rubricservice.RubricServiceApplication" />
     <module name="rubric-service" />
