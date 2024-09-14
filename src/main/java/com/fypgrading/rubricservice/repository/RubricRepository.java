@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface RubricRepository extends JpaRepository<Rubric, Integer> {
+public interface RubricRepository extends JpaRepository<Rubric, Long> {
     List<Rubric> findByAssessment(AssessmentEnum assessment);
 
     void deleteAllByAssessment(AssessmentEnum assessment);

@@ -4,24 +4,23 @@ logging:
 
 spring:
   datasource:
-#    driver-class-name: org.postgresql.Driver
     url: ${DATABASE_URL}
     username: ${DATABASE_USERNAME}
     password: ${DATABASE_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
 
-eureka:
-  client:
-    service-url:
-      default-zone: ${REGISTRY_SERVICE_URL}
-    healthcheck:
-      enabled: true
-  instance:
-    lease-expiration-duration-in-seconds: 2
-    lease-renewal-interval-in-seconds: 1
+  liquibase:
+    enabled: true
+    change-log: classpath:liquibase/master.xml
+
+#eureka:
+#  client:
+#    service-url:
+#      default-zone: ${REGISTRY_SERVICE_URL}
+#    healthcheck:
+#      enabled: true
+#  instance:
+#    lease-expiration-duration-in-seconds: 2
+#    lease-renewal-interval-in-seconds: 1
 
 server:
   port: ${PORT}

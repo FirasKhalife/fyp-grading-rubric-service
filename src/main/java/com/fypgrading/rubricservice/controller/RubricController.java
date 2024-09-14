@@ -38,7 +38,7 @@ public class RubricController {
     }
 
     @PutMapping("/{id: [0-9]+}")
-    public ResponseEntity<RubricDTO> updateRubric(@PathVariable Integer id, @RequestBody RubricDTO rubricDTO) {
+    public ResponseEntity<RubricDTO> updateRubric(@PathVariable Long id, @RequestBody RubricDTO rubricDTO) {
         RubricDTO rubrics = rubricService.updateRubric(id, rubricDTO);
         return ResponseEntity.ok().body(rubrics);
     }
@@ -51,7 +51,7 @@ public class RubricController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RubricDTO> deleteRubric(@PathVariable Integer id) {
+    public ResponseEntity<RubricDTO> deleteRubric(@PathVariable Long id) {
         RubricDTO rubrics = rubricService.deleteRubric(id);
         return ResponseEntity.ok().body(rubrics);
     }

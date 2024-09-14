@@ -41,7 +41,7 @@ public class RubricService {
 
     @HystrixCommand(fallbackMethod = "handleUpdateRubricFallback")
 
-    public RubricDTO updateRubric(Integer id, RubricDTO rubricDTO) {
+    public RubricDTO updateRubric(Long id, RubricDTO rubricDTO) {
         getRubricById(id);
         Rubric rubric = rubricMapper.toEntity(rubricDTO);
         rubric.setId(id);
@@ -51,13 +51,13 @@ public class RubricService {
 
     @HystrixCommand(fallbackMethod = "handleDeleteRubricFallback")
 
-    public RubricDTO deleteRubric(Integer id) {
+    public RubricDTO deleteRubric(Long id) {
         Rubric rubric = getRubricById(id);
         rubricRepository.delete(rubric);
         return rubricMapper.toDTO(rubric);
     }
 
-    private Rubric getRubricById(Integer id) {
+    private Rubric getRubricById(Long id) {
         return rubricRepository.findById(id).orElseThrow(() ->
                         new EntityNotFoundException("Rubric not found"));
     }
