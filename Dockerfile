@@ -1,10 +1,18 @@
+# Stage 1: Build the JAR file using Maven
+FROM maven:3.8.5-openjdk-17 AS build
+
+WORKDIR /app
+
+COPY pom.xml .
+COPY src src
+
+RUN mvn clean package -DskipTests
+
+# Stage 2: Create the final image with the built JAR
 FROM openjdk:17-jdk-slim
 
 WORKDIR /app
 
-COPY target/rubric-service-0.0.1-SNAPSHOT.jar /app/rubric.jar
+COPY --from=build /app/target/account-service-0.0.1-SNAPSHOT.jar /app/rubric.jar
 
-EXPOSE 8084
-
-CMD ["java", "-jar", "rubric.jar"]
-
+ENTRYPOINT ["java", "-jar", "rubric.jar"]
