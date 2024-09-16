@@ -3,20 +3,32 @@ package com.fypgrading.rubricservice.controller;
 import com.fypgrading.rubricservice.service.RubricService;
 import com.fypgrading.rubricservice.service.dto.RubricDTO;
 import com.fypgrading.rubricservice.service.dto.RubricDTOList;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@CrossOrigin(origins = "*", maxAge = 3600)
+@RefreshScope
 @RestController
 @RequestMapping("/api/rubrics")
 public class RubricController {
 
     private final RubricService rubricService;
+    private final String buildVersion;
 
-    public RubricController(RubricService rubricService) {
+    public RubricController(
+        RubricService rubricService,
+        @Value("${build.version}") String buildVersion
+    ) {
         this.rubricService = rubricService;
+        this.buildVersion = buildVersion;
+    }
+
+    @GetMapping("/build-version")
+    public ResponseEntity<String> getBuildVersion() {
+        return ResponseEntity.ok().body(buildVersion);
     }
 
     @GetMapping("/")
