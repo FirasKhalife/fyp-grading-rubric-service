@@ -2,7 +2,6 @@ package com.fypgrading.rubricservice.controller;
 
 import com.fypgrading.rubricservice.service.RubricService;
 import com.fypgrading.rubricservice.service.dto.RubricDTO;
-import com.fypgrading.rubricservice.service.dto.RubricDTOList;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +37,9 @@ public class RubricController {
     }
 
     @GetMapping("/{assessment}")
-    public ResponseEntity<RubricDTOList> getRubricsByAssessment(@PathVariable String assessment) {
+    public ResponseEntity<List<RubricDTO>> getRubricsByAssessment(@PathVariable String assessment) {
         List<RubricDTO> rubrics = rubricService.getRubricsByAssessment(assessment);
-        return ResponseEntity.ok().body(new RubricDTOList(rubrics));
+        return ResponseEntity.ok().body(rubrics);
     }
 
     @PostMapping("/")

@@ -16,6 +16,6 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-COPY --from=build /app/target/rubric-service-0.0.1-SNAPSHOT.jar /app/rubric.jar
+COPY --from=build /app/target/rubric-service-0.0.1-SNAPSHOT.jar /app/rubric-service.jar
 
-ENTRYPOINT ["java", "-jar", "rubric.jar"]
+ENTRYPOINT ["java", "-jar", "rubric-service.jar"]
