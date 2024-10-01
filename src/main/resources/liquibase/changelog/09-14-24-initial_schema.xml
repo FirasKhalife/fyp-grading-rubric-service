@@ -4,15 +4,97 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog 
                    http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
+    <changeSet author="Firas Khalife" id="09-14-24-create_table_assessment">
+        <createTable tableName="assessment">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="assessment_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+        </createTable>
+    </changeSet>
+
     <changeSet author="Firas Khalife" id="09-14-24-create_table_rubric">
         <createTable tableName="rubric">
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="rubric_pkey"/>
             </column>
-            <column name="name" type="CHARACTER VARYING"/>
-            <column name="percentage" type="INTEGER"/>
-            <column name="assessment" type="CHARACTER VARYING"/>
+            <column name="description" type="CHARACTER VARYING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="topic_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="level_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
+
+        <addUniqueConstraint
+                tableName="rubric"
+                columnNames="description, topic_id"
+                constraintName="unique_rubric_description_topic_id"/>
+    </changeSet>
+
+    <changeSet author="Firas Khalife" id="09-14-24-create_table_topic">
+        <createTable tableName="topic">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="topic_pkey"/>
+            </column>
+            <column name="name" type="CHARACTER VARYING">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assessment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="weight" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+                tableName="topic"
+                columnNames="name, assessment_id"
+                constraintName="unique_topic_name_assessment_id"/>
+    </changeSet>
+
+    <changeSet author="Firas Khalife" id="09-14-24-create_table_level">
+        <createTable tableName="level">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="level_pkey"/>
+            </column>
+            <column name="name" type="CHARACTER VARYING">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="weight" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="Firas Khalife" id="09-14-24-add_fk_topic_id_table_rubric">
+        <addForeignKeyConstraint baseColumnNames="topic_id"
+                                 baseTableName="rubric"
+                                 constraintName="fk_topic_id_table_rubric"
+                                 referencedColumnNames="id"
+                                 referencedTableName="topic"/>
+    </changeSet>
+
+    <changeSet author="Firas Khalife" id="09-14-24-add_fk_level_id_table_rubric">
+        <addForeignKeyConstraint baseColumnNames="level_id"
+                                 baseTableName="rubric"
+                                 constraintName="fk_level_id_table_rubric"
+                                 referencedColumnNames="id"
+                                 referencedTableName="level"/>
+    </changeSet>
+
+    <changeSet author="Firas Khalife" id="09-14-24-add_fk_assessment_id_table_topic">
+        <addForeignKeyConstraint baseColumnNames="assessment_id"
+                                 baseTableName="topic"
+                                 constraintName="fk_assessment_id_table_topic"
+                                 referencedColumnNames="id"
+                                 referencedTableName="assessment"/>
     </changeSet>
 
 </databaseChangeLog>

@@ -64,7 +64,8 @@ public class RubricService {
 
     public List<RubricDTO> getRubricsByAssessment(String assessmentStr) {
         AssessmentEnum assessment = AssessmentEnum.valueOf(assessmentStr.toUpperCase());
-        List<Rubric> rubrics = rubricRepository.findByAssessment(assessment);
+        List<Rubric> rubrics = List.of();
+//            rubricRepository.findByAssessment(assessment);
         return rubricMapper.toDTOList(rubrics);
     }
 
@@ -72,7 +73,7 @@ public class RubricService {
     public List<RubricDTO> updateRubricsByAssessment(String assessmentStr, List<RubricDTO> rubricDTOList) {
         AssessmentEnum assessment = AssessmentEnum.valueOf(assessmentStr.toUpperCase());
         List<Rubric> rubrics = rubricMapper.toEntityList(rubricDTOList);
-        rubricRepository.deleteAllByAssessment(assessment);
+//        rubricRepository.deleteAllByAssessment(assessment);
         List<Rubric> updatedEntities = rubricRepository.saveAll(rubrics);
         return rubricMapper.toDTOList(updatedEntities);
     }

@@ -1,5 +1,6 @@
 package com.fypgrading.rubricservice.entity;
 
+import com.fypgrading.rubricservice.service.enums.AssessmentEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,28 +10,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "description", "topic_id" }))
-public class Rubric {
+public class Assessment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String description;
-
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Topic topic;
-
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Level level;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, unique = true)
+    private AssessmentEnum name;
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Rubric rubric)) return false;
-        return id.equals(rubric.getId());
+        if (!(o instanceof Assessment assessment)) return false;
+        return id.equals(assessment.getId());
     }
 
     @Override
