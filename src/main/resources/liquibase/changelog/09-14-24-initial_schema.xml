@@ -42,6 +42,9 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="topic_pkey"/>
             </column>
+            <column name="number" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
             <column name="name" type="CHARACTER VARYING">
                 <constraints nullable="false"/>
             </column>
@@ -57,6 +60,11 @@
                 tableName="topic"
                 columnNames="name, assessment_id"
                 constraintName="unique_topic_name_assessment_id"/>
+
+        <addUniqueConstraint
+                tableName="topic"
+                columnNames="number, assessment_id"
+                constraintName="unique_topic_number_assessment_id"/>
     </changeSet>
 
     <changeSet author="Firas Khalife" id="09-14-24-create_table_level">

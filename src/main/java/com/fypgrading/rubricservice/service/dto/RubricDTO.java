@@ -1,6 +1,5 @@
 package com.fypgrading.rubricservice.service.dto;
 
-import com.fypgrading.rubricservice.service.enums.AssessmentEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,11 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class RubricDTO {
 
-    private Long id;
+    private String description;
 
-    private String name;
+    private TopicDTO topic;
 
-    private Integer percentage;
+    private LevelDTO level;
 
-    private AssessmentEnum assessment;
 }

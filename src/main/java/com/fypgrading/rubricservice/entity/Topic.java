@@ -9,12 +9,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "name", "assessment_id" }))
+@Table(uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "name", "assessment_id" }),
+    @UniqueConstraint(columnNames = { "number", "assessment_id" })
+})
 public class Topic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false)
+    private Integer number;
 
     @Column(nullable = false, unique = true)
     private String name;

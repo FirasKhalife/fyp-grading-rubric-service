@@ -20,6 +20,10 @@ public class Assessment {
     @Column(nullable = false, unique = true)
     private AssessmentEnum name;
 
+    public Assessment(AssessmentEnum name) {
+        this.name = name;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Assessment assessment)) return false;
