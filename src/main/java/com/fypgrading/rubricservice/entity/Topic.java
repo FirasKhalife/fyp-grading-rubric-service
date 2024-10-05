@@ -9,28 +9,34 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = { "description", "topic_id" }))
-public class Rubric {
+@Table(uniqueConstraints = {
+    @UniqueConstraint(columnNames = { "name", "assessment_id" }),
+    @UniqueConstraint(columnNames = { "number", "assessment_id" })
+})
+public class Topic {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String description;
+    private Integer number;
+
+    @Column(nullable = false, unique = true)
+    private String name;
 
     @ManyToOne
     @JoinColumn(nullable = false)
-    private Topic topic;
+    @Enumerated(EnumType.STRING)
+    private Assessment assessment;
 
-    @ManyToOne
-    @JoinColumn(nullable = false)
-    private Level level;
+    @Column(nullable = false)
+    private Integer weight;
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Rubric rubric)) return false;
-        return id.equals(rubric.getId());
+        if (!(o instanceof Topic topic)) return false;
+        return id.equals(topic.getId());
     }
 
     @Override

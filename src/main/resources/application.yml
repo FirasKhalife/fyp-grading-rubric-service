@@ -1,25 +1,47 @@
+build:
+  version: ${BUILD_VERSION}
+
+info:
+  app:
+    name: ${SPRING_APPLICATION_NAME}
+    description: "FYP Grading project - Rubric Microservice"
+    version: ${BUILD_VERSION}
+
+logging:
+  level:
+    root: INFO
+
+management:
+  metrics:
+    tags:
+      application: ${SPRING_APPLICATION_NAME}
+
 spring:
   datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5433/rubric-db
-    username: admin
-    password: admin
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
-  application:
-    name: rubric-service
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+
+  # this will in fact not be used as the service will register with eureka
+  # and get its configuration from the config server dynamically in the bootstrap phase (bootstrap.yml)
+  config:
+    import: "optional:configserver:"
+
+  liquibase:
+    enabled: true
+    change-log: classpath:liquibase/master.xml
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${AUTH_SERVER_URL}/protocol/openid-connect/certs
 
 server:
-  port: 8083
-
-eureka:
-  client:
-    service-url:
-      default-zone: http://localhost:8761/eureka/
-    healthcheck:
-      enabled: true
-  instance:
-    lease-expiration-duration-in-seconds: 2
-    lease-renewal-interval-in-seconds: 1
+  port: ${PORT}

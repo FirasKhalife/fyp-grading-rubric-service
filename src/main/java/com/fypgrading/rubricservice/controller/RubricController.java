@@ -2,21 +2,32 @@ package com.fypgrading.rubricservice.controller;
 
 import com.fypgrading.rubricservice.service.RubricService;
 import com.fypgrading.rubricservice.service.dto.RubricDTO;
-import com.fypgrading.rubricservice.service.dto.RubricDTOList;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-//@CrossOrigin(origins = "*", maxAge = 3600)
+@RefreshScope
 @RestController
 @RequestMapping("/api/rubrics")
 public class RubricController {
 
     private final RubricService rubricService;
+    private final String buildVersion;
 
-    public RubricController(RubricService rubricService) {
+    public RubricController(
+        RubricService rubricService,
+        @Value("${build.version}") String buildVersion
+    ) {
         this.rubricService = rubricService;
+        this.buildVersion = buildVersion;
+    }
+
+    @GetMapping("/build-version")
+    public ResponseEntity<String> getBuildVersion() {
+        return ResponseEntity.ok().body(buildVersion);
     }
 
     @GetMapping("/")
@@ -26,9 +37,9 @@ public class RubricController {
     }
 
     @GetMapping("/{assessment}")
-    public ResponseEntity<RubricDTOList> getRubricsByAssessment(@PathVariable String assessment) {
+    public ResponseEntity<List<RubricDTO>> getRubricsByAssessment(@PathVariable String assessment) {
         List<RubricDTO> rubrics = rubricService.getRubricsByAssessment(assessment);
-        return ResponseEntity.ok().body(new RubricDTOList(rubrics));
+        return ResponseEntity.ok().body(rubrics);
     }
 
     @PostMapping("/")
@@ -38,7 +49,7 @@ public class RubricController {
     }
 
     @PutMapping("/{id: [0-9]+}")
-    public ResponseEntity<RubricDTO> updateRubric(@PathVariable Integer id, @RequestBody RubricDTO rubricDTO) {
+    public ResponseEntity<RubricDTO> updateRubric(@PathVariable Long id, @RequestBody RubricDTO rubricDTO) {
         RubricDTO rubrics = rubricService.updateRubric(id, rubricDTO);
         return ResponseEntity.ok().body(rubrics);
     }
@@ -51,7 +62,7 @@ public class RubricController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<RubricDTO> deleteRubric(@PathVariable Integer id) {
+    public ResponseEntity<RubricDTO> deleteRubric(@PathVariable Long id) {
         RubricDTO rubrics = rubricService.deleteRubric(id);
         return ResponseEntity.ok().body(rubrics);
     }
