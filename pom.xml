@@ -18,6 +18,7 @@
         <java.version>25</java.version>
         <spring-cloud.version>2025.1.4</spring-cloud.version>
         <springdoc.version>3.0.3</springdoc.version>
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -59,6 +60,23 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <!-- exposes ${org.mockito:mockito-core:jar}, so Mockito loads as an agent (Java 25 forbids self-attach) -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals><goal>properties</goal></goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>@{argLine} -javaagent:${org.mockito:mockito-core:jar} -Xshare:off</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

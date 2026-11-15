@@ -16,7 +16,8 @@ import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Requires the {@value DemoSession#HEADER} header on every {@code /api/**} request and binds it to the
+ * Requires the {@value DemoSession#HEADER} header on every {@code /api/**} and {@code /internal/**} request
+ * (except the demo-copy endpoints, which take the session from the path) and binds it to the
  * thread. Runs after Spring Security, so an anonymous call gets 401 before it gets 400.
  */
 @Component
@@ -32,7 +33,8 @@ public class DemoSessionFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI().substring(request.getContextPath().length());
-        return !path.startsWith("/api/") || publicPaths.stream().anyMatch(p -> matcher.match(p, path));
+        return !(path.startsWith("/api/") || path.startsWith("/internal/"))
+                || path.startsWith("/internal/demo-sessions/") || publicPaths.stream().anyMatch(p -> matcher.match(p, path));
     }
 
     @Override
