@@ -6,8 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class RubricServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(RubricServiceApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(RubricServiceApplication.class, args);
+    }
 }
