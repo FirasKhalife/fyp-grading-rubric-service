@@ -1,8 +1,9 @@
 package com.fypgrading.rubricservice.rubric;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -34,11 +35,20 @@ public final class RubricDtos {
     public record RubricPut(
             @NotNull @Size(min = 1, max = 20) List<@Valid @NotNull CriterionPut> criteria) {}
 
+    /** {@code weight} is required and a whole number (33.5 is refused, not truncated). */
     public record CriterionPut(
             UUID id,
             @NotBlank @Size(max = 300) String name,
-            @Min(0) @Max(100) int weight,
-            @NotNull @Valid LevelDescriptions descriptions) {}
+
+            @NotNull @Digits(integer = 3, fraction = 0) @DecimalMin("0") @DecimalMax("100")
+            java.math.BigDecimal weight,
+
+            @NotNull @Valid LevelDescriptions descriptions) {
+
+        public int weightPercent() {
+            return weight.intValueExact();
+        }
+    }
 
     public static final List<LevelView> SCALE = List.of(
             new LevelView(4, "Exemplary"),

@@ -11,6 +11,8 @@ spring:
     url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/rubric-db}
     username: ${DATABASE_USERNAME:admin}
     password: ${DATABASE_PASSWORD:admin}
+    hikari:
+      maximum-pool-size: 5
   jpa:
     open-in-view: false
     hibernate:
@@ -26,6 +28,9 @@ spring:
 server:
   port: ${PORT:8080}
   shutdown: graceful
+  tomcat:
+    threads:
+      max: 40   # review H5: a demo needs few threads, and each costs stack memory
 
 eureka:
   client:

@@ -45,7 +45,7 @@ class RubricApiTest {
 
     @BeforeEach
     void seedCopy() {
-        copies.replace(session);
+        copies.replace(session, java.time.Instant.now());
     }
 
     static JwtRequestPostProcessor as(String role) {
@@ -136,6 +136,38 @@ class RubricApiTest {
                 // Plan 3.4: who saved it, from the token.
                 .andExpect(jsonPath("$.updatedBy.id").isNotEmpty())
                 .andExpect(jsonPath("$.updatedBy.displayName").value("Rania Haddad"));
+
+        // Review M16: a criterion id from this copy is unknown in another copy.
+        UUID other = UUID.randomUUID();
+        mvc.perform(put("/api/rubrics/PROPOSAL_PRESENTATION")
+                        .header("X-Demo-Session", other)
+                        .with(as("ADMIN"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"criteria": [{"id": "%s", "name": "Hijack", "weight": 100,
+                                  "descriptions": {"4": "a", "3": "b", "2": "c", "1": "d"}}]}""".formatted(slidesId)))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.code").value("unknown-criterion"));
+        mvc.perform(get("/api/rubrics/PROPOSAL_PRESENTATION")
+                        .header("X-Demo-Session", session)
+                        .with(as("ADMIN")))
+                .andExpect(jsonPath("$.criteria[0].name").value("Slides quality"));
+    }
+
+    /** Review low: weights are whole numbers and required. */
+    @Test
+    void aWeightMustBeAWholeNumber() throws Exception {
+        for (String weight : List.of("33.5", "null")) {
+            mvc.perform(put("/api/rubrics/PROPOSAL_PRESENTATION")
+                            .header("X-Demo-Session", session)
+                            .with(as("ADMIN"))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("""
+                                    {"criteria": [{"name": "A", "weight": %s,
+                                      "descriptions": {"4": "a", "3": "b", "2": "c", "1": "d"}}]}""".formatted(weight)))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("validation-failed"));
+        }
     }
 
     @Test

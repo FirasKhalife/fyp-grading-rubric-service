@@ -52,13 +52,15 @@ public class RubricService {
      */
     @Transactional
     public RubricView replace(Assessment assessment, RubricPut body) {
-        int total = body.criteria().stream().mapToInt(CriterionPut::weight).sum();
+        int total =
+                body.criteria().stream().mapToInt(CriterionPut::weightPercent).sum();
         if (total != 100) {
             throw ApiException.unprocessable(
                             "weights-not-100", "Weights must add up to 100%. They add up to " + total + "%.")
                     .with("totalWeight", total);
         }
-        List<Criterion> existing = criteria.findByAssessmentOrderByPosition(assessment);
+        // Locked, so two coordinators saving at once run one after the other and keep the 100% rule.
+        List<Criterion> existing = criteria.lockByAssessment(assessment);
         Map<UUID, Criterion> byId = existing.stream().collect(Collectors.toMap(Criterion::getId, Function.identity()));
         Set<UUID> seen = new HashSet<>();
         List<ApiException.FieldProblem> unknown = new ArrayList<>();
@@ -84,7 +86,7 @@ public class RubricService {
             CriterionPut item = body.criteria().get(i);
             Criterion criterion =
                     item.id() == null ? new Criterion(UUID.randomUUID(), assessment) : byId.get(item.id());
-            criterion.update(i + 1, item.name().trim(), item.weight(), item.descriptions(), now);
+            criterion.update(i + 1, item.name().trim(), item.weightPercent(), item.descriptions(), now);
             criterion.editedBy(editor.id(), editor.displayName());
             kept.add(criterion);
         }

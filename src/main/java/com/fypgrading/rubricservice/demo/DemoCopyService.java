@@ -44,13 +44,14 @@ public class DemoCopyService {
         }
     }
 
-    /** Deletes the session's copy, if any, and writes a fresh one. Idempotent. */
-    public void replace(UUID session) {
-        SeedClock seedClock = SeedClock.startingNow(clock);
-        tx.executeWithoutResult(s -> criteria.deleteCopy(session.toString()));
+    /** Deletes the session's copy, if any, and writes a fresh one, atomically. Idempotent. */
+    public void replace(UUID session, java.time.Instant createdAt) {
+        SeedClock seedClock = SeedClock.startingAt(createdAt);
+        // One transaction: the copy is never seen half-written (review M4).
         DemoSession.runAs(
                 session,
                 () -> tx.executeWithoutResult(s -> {
+                    criteria.deleteCopy(session.toString());
                     for (SeedRubric rubric : seed.rubrics()) {
                         for (SeedCriterion c : rubric.criteria()) {
                             Criterion criterion = new Criterion(SeedIds.of(session, c.key()), rubric.assessment());
@@ -68,6 +69,7 @@ public class DemoCopyService {
     @Scheduled(cron = "0 0 0 * * *", zone = "Europe/Paris")
     public void purgeAll() {
         Integer deleted = tx.execute(s -> criteria.deleteAllCopies());
+        // (A copy kept by mistake is harmless: the next PUT for that session replaces it.)
         log.info("Midnight purge: deleted {} criteria across all demo copies", deleted);
     }
 
