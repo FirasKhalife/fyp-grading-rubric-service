@@ -34,8 +34,8 @@ public class RubricService {
 
     @Transactional(readOnly = true)
     public List<RubricView> all() {
-        Map<Assessment, List<Criterion>> byAssessment = criteria.findAllByOrderByPosition().stream()
-                .collect(Collectors.groupingBy(Criterion::getAssessment));
+        Map<Assessment, List<Criterion>> byAssessment =
+                criteria.findAllByOrderByPosition().stream().collect(Collectors.groupingBy(Criterion::getAssessment));
         return Arrays.stream(Assessment.values())
                 .map(a -> view(a, byAssessment.getOrDefault(a, List.of())))
                 .toList();
@@ -54,8 +54,9 @@ public class RubricService {
     public RubricView replace(Assessment assessment, RubricPut body) {
         int total = body.criteria().stream().mapToInt(CriterionPut::weight).sum();
         if (total != 100) {
-            throw ApiException.unprocessable("weights-not-100",
-                    "Weights must add up to 100%. They add up to " + total + "%.").with("totalWeight", total);
+            throw ApiException.unprocessable(
+                            "weights-not-100", "Weights must add up to 100%. They add up to " + total + "%.")
+                    .with("totalWeight", total);
         }
         List<Criterion> existing = criteria.findByAssessmentOrderByPosition(assessment);
         Map<UUID, Criterion> byId = existing.stream().collect(Collectors.toMap(Criterion::getId, Function.identity()));
@@ -64,22 +65,24 @@ public class RubricService {
         for (int i = 0; i < body.criteria().size(); i++) {
             UUID id = body.criteria().get(i).id();
             if (id != null && (!byId.containsKey(id) || !seen.add(id))) {
-                unknown.add(new ApiException.FieldProblem("criteria[" + i + "].id",
-                        "is not a criterion of this rubric, or appears twice"));
+                unknown.add(new ApiException.FieldProblem(
+                        "criteria[" + i + "].id", "is not a criterion of this rubric, or appears twice"));
             }
         }
         if (!unknown.isEmpty()) {
-            throw new ApiException(org.springframework.http.HttpStatus.UNPROCESSABLE_CONTENT, "unknown-criterion",
-                    "Some criteria don't belong to this rubric.", unknown);
+            throw new ApiException(
+                    org.springframework.http.HttpStatus.UNPROCESSABLE_CONTENT,
+                    "unknown-criterion",
+                    "Some criteria don't belong to this rubric.",
+                    unknown);
         }
 
         Instant now = clock.instant();
         List<Criterion> kept = new ArrayList<>();
         for (int i = 0; i < body.criteria().size(); i++) {
             CriterionPut item = body.criteria().get(i);
-            Criterion criterion = item.id() == null
-                    ? new Criterion(UUID.randomUUID(), assessment)
-                    : byId.get(item.id());
+            Criterion criterion =
+                    item.id() == null ? new Criterion(UUID.randomUUID(), assessment) : byId.get(item.id());
             criterion.update(i + 1, item.name().trim(), item.weight(), item.descriptions(), now);
             kept.add(criterion);
         }
@@ -91,11 +94,20 @@ public class RubricService {
     private static RubricView view(Assessment assessment, List<Criterion> list) {
         List<CriterionView> items = list.stream()
                 .sorted(Comparator.comparingInt(Criterion::getPosition))
-                .map(c -> new CriterionView(c.getId(), c.getPosition(), c.getName(), c.getWeight(), c.getDescriptions()))
+                .map(c ->
+                        new CriterionView(c.getId(), c.getPosition(), c.getName(), c.getWeight(), c.getDescriptions()))
                 .toList();
-        Instant updatedAt = list.stream().map(Criterion::getUpdatedAt).filter(Objects::nonNull)
-                .max(Comparator.naturalOrder()).orElse(null);
-        return new RubricView(assessment, assessment.displayName(), items,
-                items.stream().mapToInt(CriterionView::weight).sum(), RubricDtos.SCALE, updatedAt);
+        Instant updatedAt = list.stream()
+                .map(Criterion::getUpdatedAt)
+                .filter(Objects::nonNull)
+                .max(Comparator.naturalOrder())
+                .orElse(null);
+        return new RubricView(
+                assessment,
+                assessment.displayName(),
+                items,
+                items.stream().mapToInt(CriterionView::weight).sum(),
+                RubricDtos.SCALE,
+                updatedAt);
     }
 }

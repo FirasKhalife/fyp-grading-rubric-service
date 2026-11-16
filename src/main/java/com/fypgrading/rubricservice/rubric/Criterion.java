@@ -47,8 +47,7 @@ public class Criterion extends AssignedIdEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
-    protected Criterion() {
-    }
+    protected Criterion() {}
 
     public Criterion(UUID id, Assessment assessment) {
         super(id);

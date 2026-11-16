@@ -13,27 +13,28 @@ import java.util.UUID;
 /** Request and response bodies of the rubric API (contract: Rubric, Criterion, RubricPut). */
 public final class RubricDtos {
 
-    private RubricDtos() {
-    }
+    private RubricDtos() {}
 
-    public record RubricView(Assessment assessment, String name, List<CriterionView> criteria, int totalWeight,
-                             List<LevelView> levels, Instant updatedAt) {
-    }
+    public record RubricView(
+            Assessment assessment,
+            String name,
+            List<CriterionView> criteria,
+            int totalWeight,
+            List<LevelView> levels,
+            Instant updatedAt) {}
 
-    public record CriterionView(UUID id, int position, String name, int weight, LevelDescriptions descriptions) {
-    }
+    public record CriterionView(UUID id, int position, String name, int weight, LevelDescriptions descriptions) {}
 
-    public record LevelView(int value, String name) {
-    }
+    public record LevelView(int value, String name) {}
 
-    public record RubricPut(@NotNull @Size(min = 1, max = 20) List<@Valid @NotNull CriterionPut> criteria) {
-    }
+    public record RubricPut(
+            @NotNull @Size(min = 1, max = 20) List<@Valid @NotNull CriterionPut> criteria) {}
 
-    public record CriterionPut(UUID id,
-                               @NotBlank @Size(max = 300) String name,
-                               @Min(0) @Max(100) int weight,
-                               @NotNull @Valid LevelDescriptions descriptions) {
-    }
+    public record CriterionPut(
+            UUID id,
+            @NotBlank @Size(max = 300) String name,
+            @Min(0) @Max(100) int weight,
+            @NotNull @Valid LevelDescriptions descriptions) {}
 
     public static final List<LevelView> SCALE = List.of(
             new LevelView(4, "Exemplary"),

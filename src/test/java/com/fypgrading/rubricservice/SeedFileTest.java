@@ -12,7 +12,9 @@ class SeedFileTest {
 
     @Test
     void everyRubricHasFiveAssessmentsWorthOfCriteriaAddingUpTo100() {
-        JsonNode seed = JsonMapper.builder().build().readTree(Path.of("src/main/resources/demo/seed.json").toFile());
+        JsonNode seed = JsonMapper.builder()
+                .build()
+                .readTree(Path.of("src/main/resources/demo/seed.json").toFile());
         assertThat(seed.get("rubrics")).hasSize(5);
         for (JsonNode rubric : seed.get("rubrics")) {
             int total = 0;

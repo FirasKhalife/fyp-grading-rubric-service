@@ -48,15 +48,17 @@ public class DemoCopyService {
     public void replace(UUID session) {
         SeedClock seedClock = SeedClock.startingNow(clock);
         tx.executeWithoutResult(s -> criteria.deleteCopy(session.toString()));
-        DemoSession.runAs(session, () -> tx.executeWithoutResult(s -> {
-            for (SeedRubric rubric : seed.rubrics()) {
-                for (SeedCriterion c : rubric.criteria()) {
-                    Criterion criterion = new Criterion(SeedIds.of(session, c.key()), rubric.assessment());
-                    criterion.update(c.position(), c.name(), c.weight(), c.descriptions(), seedClock.now());
-                    criteria.save(criterion);
-                }
-            }
-        }));
+        DemoSession.runAs(
+                session,
+                () -> tx.executeWithoutResult(s -> {
+                    for (SeedRubric rubric : seed.rubrics()) {
+                        for (SeedCriterion c : rubric.criteria()) {
+                            Criterion criterion = new Criterion(SeedIds.of(session, c.key()), rubric.assessment());
+                            criterion.update(c.position(), c.name(), c.weight(), c.descriptions(), seedClock.now());
+                            criteria.save(criterion);
+                        }
+                    }
+                }));
     }
 
     public void delete(UUID session) {
@@ -69,12 +71,9 @@ public class DemoCopyService {
         log.info("Midnight purge: deleted {} criteria across all demo copies", deleted);
     }
 
-    record Seed(List<SeedRubric> rubrics) {
-    }
+    record Seed(List<SeedRubric> rubrics) {}
 
-    record SeedRubric(Assessment assessment, String name, List<SeedCriterion> criteria) {
-    }
+    record SeedRubric(Assessment assessment, String name, List<SeedCriterion> criteria) {}
 
-    record SeedCriterion(String key, int position, String name, int weight, LevelDescriptions descriptions) {
-    }
+    record SeedCriterion(String key, int position, String name, int weight, LevelDescriptions descriptions) {}
 }

@@ -9,5 +9,4 @@ public record LevelDescriptions(
         @JsonProperty("4") @NotBlank @Size(max = 1000) String exemplary,
         @JsonProperty("3") @NotBlank @Size(max = 1000) String accomplished,
         @JsonProperty("2") @NotBlank @Size(max = 1000) String developing,
-        @JsonProperty("1") @NotBlank @Size(max = 1000) String beginning) {
-}
+        @JsonProperty("1") @NotBlank @Size(max = 1000) String beginning) {}
