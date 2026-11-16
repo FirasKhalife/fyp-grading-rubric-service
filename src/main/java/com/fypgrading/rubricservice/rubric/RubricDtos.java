@@ -21,7 +21,11 @@ public final class RubricDtos {
             List<CriterionView> criteria,
             int totalWeight,
             List<LevelView> levels,
-            Instant updatedAt) {}
+            Instant updatedAt,
+            Editor updatedBy) {}
+
+    /** Who last saved the rubric. */
+    public record Editor(UUID id, String displayName) {}
 
     public record CriterionView(UUID id, int position, String name, int weight, LevelDescriptions descriptions) {}
 

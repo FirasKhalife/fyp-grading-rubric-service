@@ -49,8 +49,9 @@ class RubricApiTest {
     }
 
     static JwtRequestPostProcessor as(String role) {
-        return jwt().jwt(j ->
-                        j.subject(UUID.randomUUID().toString()).claim("realm_access", Map.of("roles", List.of(role))))
+        return jwt().jwt(j -> j.subject(UUID.randomUUID().toString())
+                        .claim("realm_access", Map.of("roles", List.of(role)))
+                        .claim("name", "Rania Haddad"))
                 .authorities(new SimpleGrantedAuthority("ROLE_" + role));
     }
 
@@ -131,7 +132,10 @@ class RubricApiTest {
                 .andExpect(jsonPath("$.criteria[0].id").value(slidesId))
                 .andExpect(jsonPath("$.criteria[0].position").value(1))
                 .andExpect(jsonPath("$.criteria[1].name").value("Demo"))
-                .andExpect(jsonPath("$.criteria.length()").value(2));
+                .andExpect(jsonPath("$.criteria.length()").value(2))
+                // Plan 3.4: who saved it, from the token.
+                .andExpect(jsonPath("$.updatedBy.id").isNotEmpty())
+                .andExpect(jsonPath("$.updatedBy.displayName").value("Rania Haddad"));
     }
 
     @Test

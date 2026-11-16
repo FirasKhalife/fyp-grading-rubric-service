@@ -1,5 +1,6 @@
 package com.fypgrading.rubricservice.rubric;
 
+import com.fypgrading.rubricservice.common.security.CurrentUser;
 import com.fypgrading.rubricservice.common.web.ApiException;
 import com.fypgrading.rubricservice.rubric.RubricDtos.CriterionPut;
 import com.fypgrading.rubricservice.rubric.RubricDtos.CriterionView;
@@ -13,7 +14,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -78,12 +78,14 @@ public class RubricService {
         }
 
         Instant now = clock.instant();
+        CurrentUser editor = CurrentUser.require();
         List<Criterion> kept = new ArrayList<>();
         for (int i = 0; i < body.criteria().size(); i++) {
             CriterionPut item = body.criteria().get(i);
             Criterion criterion =
                     item.id() == null ? new Criterion(UUID.randomUUID(), assessment) : byId.get(item.id());
             criterion.update(i + 1, item.name().trim(), item.weight(), item.descriptions(), now);
+            criterion.editedBy(editor.id(), editor.displayName());
             kept.add(criterion);
         }
         existing.stream().filter(c -> !seen.contains(c.getId())).forEach(criteria::delete);
@@ -97,17 +99,21 @@ public class RubricService {
                 .map(c ->
                         new CriterionView(c.getId(), c.getPosition(), c.getName(), c.getWeight(), c.getDescriptions()))
                 .toList();
-        Instant updatedAt = list.stream()
-                .map(Criterion::getUpdatedAt)
-                .filter(Objects::nonNull)
-                .max(Comparator.naturalOrder())
+        Criterion latest = list.stream()
+                .filter(c -> c.getUpdatedAt() != null)
+                .max(Comparator.comparing(Criterion::getUpdatedAt))
                 .orElse(null);
+        Instant updatedAt = latest == null ? null : latest.getUpdatedAt();
+        RubricDtos.Editor editor = latest == null || latest.getUpdatedBy() == null
+                ? null
+                : new RubricDtos.Editor(latest.getUpdatedBy(), latest.getUpdatedByName());
         return new RubricView(
                 assessment,
                 assessment.displayName(),
                 items,
                 items.stream().mapToInt(CriterionView::weight).sum(),
                 RubricDtos.SCALE,
-                updatedAt);
+                updatedAt,
+                editor);
     }
 }

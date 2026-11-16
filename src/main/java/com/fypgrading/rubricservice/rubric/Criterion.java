@@ -47,6 +47,13 @@ public class Criterion extends AssignedIdEntity {
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
+    /** The coordinator who last saved this criterion (null for the seed). Plan 3.4: never "SYSTEM" for a person. */
+    @Column(name = "updated_by")
+    private UUID updatedBy;
+
+    @Column(name = "updated_by_name", length = 120)
+    private String updatedByName;
+
     protected Criterion() {}
 
     public Criterion(UUID id, Assessment assessment) {
@@ -87,5 +94,18 @@ public class Criterion extends AssignedIdEntity {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+    public void editedBy(UUID user, String name) {
+        this.updatedBy = user;
+        this.updatedByName = name;
+    }
+
+    public UUID getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public String getUpdatedByName() {
+        return updatedByName;
     }
 }
