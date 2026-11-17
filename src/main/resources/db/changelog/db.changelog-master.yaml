@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 2026-11-15-01-drop-legacy-schema
+      author: assay
+      comment: The pre-Assay schema (assessment, topic, level, rubric) is replaced by one criterion table.
+      changes:
+        - sql:
+            sql: DROP TABLE IF EXISTS rubric, topic, level, assessment CASCADE
+  - changeSet:
+      id: 2026-11-15-02-criterion
+      author: assay
+      changes:
+        - createTable:
+            tableName: criterion
+            columns:
+              - column: {name: id, type: uuid, constraints: {primaryKey: true}}
+              - column: {name: demo_session, type: varchar(36), constraints: {nullable: false}}
+              - column: {name: assessment, type: varchar(32), constraints: {nullable: false}}
+              - column: {name: position, type: int, constraints: {nullable: false}}
+              - column: {name: name, type: varchar(300), constraints: {nullable: false}}
+              - column: {name: weight, type: int, constraints: {nullable: false}}
+              - column: {name: level4, type: varchar(1000), constraints: {nullable: false}}
+              - column: {name: level3, type: varchar(1000), constraints: {nullable: false}}
+              - column: {name: level2, type: varchar(1000), constraints: {nullable: false}}
+              - column: {name: level1, type: varchar(1000), constraints: {nullable: false}}
+              - column: {name: updated_at, type: timestamp with time zone, constraints: {nullable: false}}
+        - createIndex:
+            tableName: criterion
+            indexName: ix_criterion_session_assessment
+            columns:
+              - column: {name: demo_session}
+              - column: {name: assessment}
+              - column: {name: position}
+        - sql:
+            sql: ALTER TABLE criterion ADD CONSTRAINT ck_criterion_weight CHECK (weight BETWEEN 0 AND 100)
+  - changeSet:
+      id: 2026-11-16-01-criterion-editor
+      author: assay
+      comment: Plan 3.4. Who last saved each criterion (null for the seed).
+      changes:
+        - addColumn:
+            tableName: criterion
+            columns:
+              - column: {name: updated_by, type: uuid}
+              - column: {name: updated_by_name, type: varchar(120)}

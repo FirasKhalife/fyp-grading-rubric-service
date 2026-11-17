@@ -1,0 +1,8 @@
+{"rubrics": [
+  {"assessment": "PROPOSAL_PRESENTATION", "name": "Proposal presentation", "criteria": [
+    {"key": "criterion:PROPOSAL_PRESENTATION:1", "position": 1, "name": "Objectives", "weight": 60,
+     "descriptions": {"4": "All objectives.", "3": "Main objectives.", "2": "Some objectives.", "1": "No objectives."}},
+    {"key": "criterion:PROPOSAL_PRESENTATION:2", "position": 2, "name": "Slides", "weight": 40,
+     "descriptions": {"4": "Clear.", "3": "Mostly clear.", "2": "Dense.", "1": "Unreadable."}}
+  ]}
+]}
