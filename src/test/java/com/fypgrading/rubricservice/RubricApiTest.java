@@ -1,11 +1,13 @@
 package com.fypgrading.rubricservice;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.fypgrading.rubricservice.common.security.TestTokens;
 import com.fypgrading.rubricservice.demo.DemoCopyService;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.postgresql.PostgreSQLContainer;
@@ -175,5 +180,40 @@ class RubricApiTest {
         mvc.perform(get("/api/rubrics/THESIS").header("X-Demo-Session", session).with(as("ADMIN")))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("validation-failed"));
+    }
+
+    @DynamicPropertySource
+    static void realTokenKeys(DynamicPropertyRegistry registry) {
+        registry.add("spring.security.oauth2.resourceserver.jwt.jwk-set-uri", TestTokens::jwkSetUri);
+    }
+
+    /** A signed token through the real decoder (not the jwt() shortcut), as the gateway forwards it. */
+    private ResultActions withToken(String token) throws Exception {
+        return mvc.perform(get("/api/rubrics/PROPOSAL_PRESENTATION")
+                .header("X-Demo-Session", session)
+                .header("Authorization", "Bearer " + token));
+    }
+
+    @Test
+    void aSignedTokenFromOurIssuerToOurClientIsAccepted() throws Exception {
+        int status = withToken(TestTokens.token(TestTokens.ISSUER, TestTokens.CLIENT, "ADMIN"))
+                .andReturn()
+                .getResponse()
+                .getStatus();
+        assertThat(status).isNotIn(401, 403);
+    }
+
+    @Test
+    void aTokenFromAnotherIssuerIsRejected() throws Exception {
+        withToken(TestTokens.token("http://elsewhere.test/realms/assay", TestTokens.CLIENT, "ADMIN"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("unauthenticated"));
+    }
+
+    @Test
+    void aTokenIssuedToAnotherClientIsRejected() throws Exception {
+        withToken(TestTokens.token(TestTokens.ISSUER, "admin-cli", "ADMIN"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("unauthenticated"));
     }
 }
